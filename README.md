@@ -18,9 +18,22 @@ Write the C Program using Linux IO Systems locking
 Execute the C Program for the desired output. 
 
 # PROGRAM:
-
 ## 1.To Write a C program that illustrates files copying 
-
+~~~
+include <sys/stat.h>
+#include <fcntl.h>
+#include <stdlib.h>
+int main()
+{
+char block[1024];
+int in, out;
+int nread;
+in = open("filecopy.c", O_RDONLY);
+out = open("file.out", O_WRONLY|O_CREAT, S_IRUSR|S_IWUSR);
+while((nread = read(in,block,sizeof(block))) > 0)
+write(out,block,nread);
+exit(0);}
+~~~
 
 
 
@@ -28,11 +41,53 @@ Execute the C Program for the desired output.
 
 
 ## 2.To Write a C program that illustrates files locking
+~~~
+#include <fcntl.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/file.h>
+int main (int argc, char* argv[])
+{ char* file = argv[1];
+ int fd;
+ struct flock lock;
+ printf ("opening %s\n", file);
+ /* Open a file descriptor to the file. */
+ fd = open (file, O_WRONLY);
+// acquire shared lock
+if (flock(fd, LOCK_SH) == -1) {
+    printf("error");
+}else
+{printf("Acquiring shared lock using flock");
+}
+getchar();
+// non-atomically upgrade to exclusive lock
+// do it in non-blocking mode, i.e. fail if can't upgrade immediately
+if (flock(fd, LOCK_EX | LOCK_NB) == -1) {
+    printf("error");
+}else
+{printf("Acquiring exclusive lock using flock");}
+getchar();
+// release lock
+// lock is also released automatically when close() is called or process exits
+if (flock(fd, LOCK_UN) == -1) {
+    printf("error");
+}else{
+printf("unlocking");
+}
+getchar();
+close (fd);
+return 0;
+}
+~~~
+
 
 
 
 
 ## OUTPUT
+![377328875-acd2dc9c-6b1e-46bb-9bc7-f8b8138a9106](https://github.com/user-attachments/assets/ebeb9522-828f-4f43-8c92-0cee49ca20de)
+![377328999-e28141d6-03f9-4b7b-a145-dfdb03047cfa](https://github.com/user-attachments/assets/68ffff6e-3286-4f48-821e-48a63afbcc18)
 
 
 
